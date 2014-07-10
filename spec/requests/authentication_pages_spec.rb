@@ -44,25 +44,6 @@ describe "Authentication" do
 
     describe "for non-signed-in users" do
       let(:user) { FactoryGirl.create(:user) }
-
-      describe "in the Users controller" do
-
-        describe "visiting the edit page" do
-          before { visit edit_user_path(user) }
-          it { should have_title('Sign in') }
-        end
-
-        describe "submitting to the update action" do
-          before { patch user_path(user) }
-          specify { expect(response).to redirect_to(signin_path) }
-        end
-      end
-    end
-  end
-  describe "authorization" do
-
-    describe "for non-signed-in users" do
-      let(:user) { FactoryGirl.create(:user) }
       describe "when attempting to visit a protected page" do
         before do
           visit edit_user_path(user)
@@ -70,12 +51,23 @@ describe "Authentication" do
           fill_in "Password", with: user.password
           click_button "Sign in"
         end
-
+       
         describe "after signing in" do
 
           it "should render the desired protected page" do
             expect(page).to have_title('Edit user')
           end
+        end
+      end
+      describe "in the Relationships controller" do
+        describe "submitting to the create action" do
+          before { post relationships_path }
+          specify { expect(response).to redirect_to(signin_path) }
+        end
+
+        describe "submitting to the destroy action" do
+          before { delete relationship_path(1) }
+          specify { expect(response).to redirect_to(signin_path) }
         end
       end
       describe "in the Microposts controller" do
@@ -90,8 +82,28 @@ describe "Authentication" do
           specify { expect(response).to redirect_to(signin_path) }
         end
       end
+      
+
       describe "in the Users controller" do
 
+        describe "visiting the edit page" do
+          before { visit edit_user_path(user) }
+          it { should have_title('Sign in') }
+        end
+
+        describe "submitting to the update action" do
+          before { patch user_path(user) }
+          specify { expect(response).to redirect_to(signin_path) }
+        end
+        describe "visiting the following page" do
+          before { visit following_user_path(user) }
+          it { should have_title('Sign in') }
+        end
+
+        describe "visiting the followers page" do
+          before { visit followers_user_path(user) }
+          it { should have_title('Sign in') }
+        end
         describe "visiting the edit page" do
           before { visit edit_user_path(user) }
           it { should have_title('Sign in') }
@@ -106,7 +118,10 @@ describe "Authentication" do
           it { should have_title('Sign in') }
         end
       end
-    end
+     end
+  
+      
+    
   describe "as wrong user" do
       let(:user) { FactoryGirl.create(:user) }
       let(:wrong_user) { FactoryGirl.create(:user, email: "wrong@example.com") }
